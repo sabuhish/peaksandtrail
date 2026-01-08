@@ -1,5 +1,6 @@
 import base64
-from fastapi import Depends, HTTPException, status, Request
+import secrets
+from fastapi import Depends, Header, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.core.config import settings
@@ -45,49 +46,25 @@ async def get_current_user(
     return user
 
 
-async def verify_register_basic_auth(request: Request):
-    """Verify Basic Auth credentials for registration endpoint."""
-    authorization: str = request.headers.get("Authorization")
-
-    if not authorization:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Missing Authorization header",
-            headers={"WWW-Authenticate": "Basic"},
-        )
-
+def verify_basic_credentials(x_api_key: str = Header(alias="X-API-Key")):
+    """Verify credentials from X-API-Key header with base64 encoded username:password."""
     try:
-        scheme, credentials = authorization.split()
-        if scheme.lower() != "basic":
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid authentication scheme. Use Basic Auth.",
-                headers={"WWW-Authenticate": "Basic"},
-            )
-
-        decoded = base64.b64decode(credentials).decode("utf-8")
+        decoded = base64.b64decode(x_api_key).decode("utf-8")
         username, password = decoded.split(":", 1)
 
-        if (
-            username != settings.auth_username
-            or password != settings.auth_password
-        ):
+        correct_username = secrets.compare_digest(
+            username, settings.auth_username
+        )
+        correct_password = secrets.compare_digest(
+            password, settings.auth_password
+        )
+        if not (correct_username and correct_password):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid credentials",
-                headers={"WWW-Authenticate": "Basic"},
             )
-
-        return True
-    except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid Authorization header format",
-            headers={"WWW-Authenticate": "Basic"},
-        )
     except Exception:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Basic"},
+            status_code=401,
+            detail="Authentication failed",
         )

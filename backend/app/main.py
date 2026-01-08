@@ -2,11 +2,14 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import auth, participants, tours
+from app.core.config import settings
 
 app = FastAPI(
     title="Tour Management API",
     description="API for managing tours and participants",
     version="0.1.0",
+    docs_url="/docs" if settings.environment == "development" else None,
+    redoc_url="/redoc" if settings.environment == "development" else None,
 )
 
 app.add_middleware(

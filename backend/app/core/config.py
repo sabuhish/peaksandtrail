@@ -55,5 +55,9 @@ class Settings:
     def auth_password(self) -> str:
         return os.getenv("AUTH_PASSWORD", "admin123")
 
+    @property
+    def environment(self) -> str:
+        return os.getenv("ENVIRONMENT", "development")
+
 
 settings = Settings()
