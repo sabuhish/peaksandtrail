@@ -1,17 +1,19 @@
-FROM python:3.11-slim
+FROM eu.gcr.io/finmarket/virtualcards/python-base-image:3.13.7-slim
 
-WORKDIR /app
+ENV APP_HOME=/usr/src/app
+WORKDIR $APP_HOME
+    
+COPY pyproject.toml poetry.lock ./
 
-RUN apt-get update && apt-get install -y \
-    gcc \
-    postgresql-client \
-    && rm -rf /var/lib/apt/lists/*
-
-COPY pyproject.toml .
-
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -e .
+RUN poetry config virtualenvs.create false && \
+    poetry install --no-interaction --no-ansi --without dev --no-cache
+    
+RUN apt update && apt upgrade -y && apt install ca-certificates && update-ca-certificates
 
 COPY . .
+
+EXPOSE 8080
+
+RUN chmod +x entrypoint.sh
 
 ENTRYPOINT ["./entrypoint.sh"]
