@@ -24,14 +24,8 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: tour_management_backend
-    environment:
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT}
-      DB_NAME: ${DB_NAME}
-      SECRET_KEY: ${SECRET_KEY}
-      ALGORITHM: ${ALGORITHM}
+    env_file:
+      - .env
     ports:
       - "8080:8080"
     depends_on:
