@@ -2,7 +2,9 @@ FROM python:3.11-slim
 
 ENV APP_HOME=/usr/src/app
 WORKDIR $APP_HOME
-    
+
+RUN pip install --no-cache-dir poetry
+
 COPY pyproject.toml poetry.lock ./
 
 RUN poetry config virtualenvs.create false && \
