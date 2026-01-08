@@ -47,5 +47,13 @@ class Settings:
     def access_token_expire_min(self) -> int:
         return 60 * 24 * 7  # 7 days
 
+    @property
+    def auth_username(self) -> str:
+        return os.getenv("AUTH_USERNAME", "admin")
+
+    @property
+    def auth_password(self) -> str:
+        return os.getenv("AUTH_PASSWORD", "admin123")
+
 
 settings = Settings()
