@@ -1,4 +1,4 @@
-FROM eu.gcr.io/finmarket/virtualcards/python-base-image:3.13.7-slim
+FROM python:3.11-slim
 
 ENV APP_HOME=/usr/src/app
 WORKDIR $APP_HOME
