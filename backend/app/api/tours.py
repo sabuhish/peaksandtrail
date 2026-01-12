@@ -1,3 +1,4 @@
+from urllib.parse import quote
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -96,12 +97,19 @@ async def export_tour(
     # Generate Excel file
     excel_file = generate_tour_excel(tour_data, participants_data)
 
-    # Create filename with tour name (sanitized)
-    safe_name = "".join(c for c in tour_data['name'] if c.isalnum() or c in (" ", "-", "_"))
-    filename = f"{safe_name}_participants.xlsx"
+    # Create filename with tour name
+    # Use ASCII-only fallback and RFC 2231 UTF-8 encoded filename
+    ascii_name = "".join(c for c in tour_data['name'] if c.isascii() and (c.isalnum() or c in (" ", "-", "_")))
+    if not ascii_name.strip():
+        ascii_name = "tour"
+    ascii_filename = f"{ascii_name}_participants.xlsx"
+
+    # RFC 2231 encoded UTF-8 filename for proper international character support
+    utf8_filename = f"{tour_data['name']}_participants.xlsx"
+    encoded_filename = quote(utf8_filename.encode('utf-8'))
 
     return StreamingResponse(
         excel_file,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+        headers={"Content-Disposition": f"attachment; filename=\"{ascii_filename}\"; filename*=UTF-8''{encoded_filename}"},
     )
