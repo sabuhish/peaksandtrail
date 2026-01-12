@@ -74,11 +74,30 @@ async def export_tour(
     if not tour:
         raise HTTPException(status_code=404, detail="Tour not found")
 
+    # Access all attributes while still in async context to avoid detached instance errors
+    tour_data = {
+        'name': tour.name,
+        'start_date': tour.start_date,
+        'end_date': tour.end_date,
+        'guides': tour.guides,
+    }
+
+    # Eagerly load participants data
+    participants_data = [
+        {
+            'name': p.name,
+            'surname': p.surname,
+            'birth_date': p.birth_date,
+            'phone_number': p.phone_number,
+        }
+        for p in tour.participants
+    ]
+
     # Generate Excel file
-    excel_file = generate_tour_excel(tour, tour.participants)
+    excel_file = generate_tour_excel(tour_data, participants_data)
 
     # Create filename with tour name (sanitized)
-    safe_name = "".join(c for c in tour.name if c.isalnum() or c in (" ", "-", "_"))
+    safe_name = "".join(c for c in tour_data['name'] if c.isalnum() or c in (" ", "-", "_"))
     filename = f"{safe_name}_participants.xlsx"
 
     return StreamingResponse(

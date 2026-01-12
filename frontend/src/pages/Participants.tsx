@@ -248,7 +248,7 @@ export default function Participants() {
                       {new Date(participant.birth_date).toLocaleDateString()}
                     </div>
                     <div>
-                      <span className="font-semibold">Paid Amount:</span> ${participant.paid_amount}
+                      <span className="font-semibold">Paid Amount:</span> ₼{participant.paid_amount}
                     </div>
                   </div>
                 </CardContent>

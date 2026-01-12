@@ -1,21 +1,18 @@
 from io import BytesIO
-from typing import List
+from typing import Any, List
 
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 
-from app.models.participant import Participant
-from app.models.tour import Tour
 
-
-def generate_tour_excel(tour: Tour, participants: List[Participant]) -> BytesIO:
+def generate_tour_excel(tour: dict[str, Any], participants: List[dict[str, Any]]) -> BytesIO:
     """
     Generate an Excel file for a tour with participant list and attendance checkbox.
 
     Args:
-        tour: Tour object
-        participants: List of participants for the tour
+        tour: Dictionary containing tour data (name, start_date, end_date, guides)
+        participants: List of dictionaries containing participant data
 
     Returns:
         BytesIO: Excel file in memory
@@ -37,19 +34,19 @@ def generate_tour_excel(tour: Tour, participants: List[Participant]) -> BytesIO:
     # Tour information section
     ws.merge_cells("A1:G1")
     tour_title = ws["A1"]
-    tour_title.value = f"Tour: {tour.name}"
+    tour_title.value = f"Tour: {tour['name']}"
     tour_title.font = Font(bold=True, size=14)
     tour_title.alignment = Alignment(horizontal="center")
 
     ws.merge_cells("A2:G2")
     tour_dates = ws["A2"]
-    tour_dates.value = f"Dates: {tour.start_date} to {tour.end_date}"
+    tour_dates.value = f"Dates: {tour['start_date']} to {tour['end_date']}"
     tour_dates.font = Font(size=11)
     tour_dates.alignment = Alignment(horizontal="center")
 
     ws.merge_cells("A3:G3")
     tour_guides = ws["A3"]
-    tour_guides.value = f"Guides: {tour.guides}"
+    tour_guides.value = f"Guides: {tour['guides']}"
     tour_guides.font = Font(size=11)
     tour_guides.alignment = Alignment(horizontal="center")
 
@@ -80,10 +77,10 @@ def generate_tour_excel(tour: Tour, participants: List[Participant]) -> BytesIO:
         row_num = header_row + idx
         row_data = [
             idx,
-            participant.name,
-            participant.surname,
-            str(participant.birth_date),
-            participant.phone_number,
+            participant['name'],
+            participant['surname'],
+            str(participant['birth_date']),
+            participant['phone_number'],
             "",  # Empty checkbox column
             "",  # Empty signature column
         ]
