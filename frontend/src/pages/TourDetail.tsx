@@ -17,6 +17,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ArrowLeft, Download, Plus, Trash2 } from 'lucide-react'
+import { ParticipantSearch } from '@/components/participant-search'
 import ReactMarkdown from 'react-markdown'
 
 export default function TourDetail() {
@@ -213,7 +214,7 @@ export default function TourDetail() {
                         </div>
                         <div className="grid grid-cols-2 max-md:grid-cols-1 gap-x-4 gap-y-2 text-sm">
                           <div>
-                            <span className="text-muted-foreground">Email:</span> {participant.email}
+                            <span className="text-muted-foreground">Email:</span> {participant.email || '-'}
                           </div>
                           <div>
                             <span className="text-muted-foreground">Phone:</span>{' '}
@@ -221,7 +222,7 @@ export default function TourDetail() {
                           </div>
                           <div>
                             <span className="text-muted-foreground">Birth Date:</span>{' '}
-                            {new Date(participant.birth_date).toLocaleDateString()}
+                            {participant.birth_date ? new Date(participant.birth_date).toLocaleDateString() : '-'}
                           </div>
                           <div>
                             <span className="text-muted-foreground">Paid Amount:</span> ₼
@@ -253,6 +254,18 @@ export default function TourDetail() {
           </DialogHeader>
           <form onSubmit={handleSubmit}>
             <div className="grid gap-4 py-4">
+              <ParticipantSearch
+                onSelect={(p) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    name: p.name,
+                    surname: p.surname,
+                    email: p.email || '',
+                    phone_number: p.phone_number,
+                    birth_date: p.birth_date || '',
+                  }))
+                }
+              />
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="name">First Name</Label>
@@ -281,7 +294,6 @@ export default function TourDetail() {
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    required
                   />
                 </div>
                 <div className="grid gap-2">
@@ -302,7 +314,6 @@ export default function TourDetail() {
                     type="date"
                     value={formData.birth_date}
                     onChange={(e) => setFormData({ ...formData, birth_date: e.target.value })}
-                    required
                   />
                 </div>
                 <div className="grid gap-2">

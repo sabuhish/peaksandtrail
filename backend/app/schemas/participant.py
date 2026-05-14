@@ -9,9 +9,9 @@ class ParticipantBase(BaseModel):
     name: str
     surname: str
     paid_amount: Decimal
-    birth_date: date
+    birth_date: date | None = None
     phone_number: str
-    email: EmailStr
+    email: EmailStr | None = None
 
 
 class ParticipantCreate(ParticipantBase):

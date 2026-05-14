@@ -1,6 +1,7 @@
 from uuid import UUID
-from sqlalchemy import select
+from sqlalchemy import select, or_
 
+from app.core.database import SessionLocal
 from app.models.participant import Participant
 from app.schemas.participant import ParticipantCreate, ParticipantUpdate
 
@@ -32,3 +33,22 @@ async def update_participant(
 
 async def delete_participant(participant_id: UUID) -> bool:
     return await Participant.delete(Participant.id == participant_id)
+
+
+async def search_participants(query: str, limit: int = 10) -> list[Participant]:
+    pattern = f"%{query}%"
+    stmt = (
+        select(Participant)
+        .where(
+            or_(
+                Participant.name.ilike(pattern),
+                Participant.surname.ilike(pattern),
+            )
+        )
+        .distinct(Participant.name, Participant.surname, Participant.phone_number)
+        .order_by(Participant.name, Participant.surname, Participant.phone_number)
+        .limit(limit)
+    )
+    async with SessionLocal() as session:
+        result = await session.execute(stmt)
+        return list(result.scalars().all())

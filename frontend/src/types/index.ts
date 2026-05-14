@@ -38,9 +38,9 @@ export interface Participant {
   name: string
   surname: string
   paid_amount: number
-  birth_date: string
+  birth_date: string | null
   phone_number: string
-  email: string
+  email: string | null
   created_at: string
   updated_at: string
 }
@@ -54,6 +54,7 @@ export interface ParticipantCreate {
   phone_number: string
   email: string
 }
+
 
 export interface ParticipantUpdate {
   tour_id?: string

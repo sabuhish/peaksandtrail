@@ -15,16 +15,31 @@ export const participantsService = {
   },
 
   async create(data: ParticipantCreate): Promise<Participant> {
-    const response = await api.post<Participant>('/participants/', data);
+    const payload = {
+      ...data,
+      birth_date: data.birth_date === '' ? null : data.birth_date,
+      email: data.email === '' ? null : data.email,
+    };
+    const response = await api.post<Participant>('/participants/', payload);
     return response.data;
   },
 
   async update(id: string, data: ParticipantUpdate): Promise<Participant> {
-    const response = await api.put<Participant>(`/participants/${id}`, data);
+    const payload = {
+      ...data,
+      ...(data.birth_date !== undefined && { birth_date: data.birth_date === '' ? null : data.birth_date }),
+      ...(data.email !== undefined && { email: data.email === '' ? null : data.email }),
+    };
+    const response = await api.put<Participant>(`/participants/${id}`, payload);
     return response.data;
   },
 
   async delete(id: string): Promise<void> {
     await api.delete(`/participants/${id}`);
+  },
+
+  async search(query: string): Promise<Participant[]> {
+    const response = await api.get<Participant[]>('/participants/search', { params: { q: query } });
+    return response.data;
   },
 };

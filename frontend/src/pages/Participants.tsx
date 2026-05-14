@@ -17,6 +17,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Plus, Pencil, Trash2, ArrowLeft } from 'lucide-react'
+import { ParticipantSearch } from '@/components/participant-search'
 
 export default function Participants() {
   const { toast } = useToast()
@@ -96,9 +97,9 @@ export default function Participants() {
       name: participant.name,
       surname: participant.surname,
       paid_amount: participant.paid_amount,
-      birth_date: participant.birth_date,
+      birth_date: participant.birth_date || '',
       phone_number: participant.phone_number,
-      email: participant.email,
+      email: participant.email || '',
     })
     setIsDialogOpen(true)
   }
@@ -238,14 +239,14 @@ export default function Participants() {
                 <CardContent>
                   <div className="grid grid-cols-2 max-md:grid-cols-1 gap-x-4 gap-y-2 text-sm">
                     <div>
-                      <span className="font-semibold">Email:</span> {participant.email}
+                      <span className="font-semibold">Email:</span> {participant.email || '-'}
                     </div>
                     <div>
                       <span className="font-semibold">Phone:</span> {participant.phone_number}
                     </div>
                     <div>
                       <span className="font-semibold">Birth Date:</span>{' '}
-                      {new Date(participant.birth_date).toLocaleDateString()}
+                      {participant.birth_date ? new Date(participant.birth_date).toLocaleDateString() : '-'}
                     </div>
                     <div>
                       <span className="font-semibold">Paid Amount:</span> ₼{participant.paid_amount}
@@ -296,6 +297,20 @@ export default function Participants() {
           </DialogHeader>
           <form onSubmit={handleSubmit}>
             <div className="grid gap-4 py-4">
+              {!editingParticipant && (
+                <ParticipantSearch
+                  onSelect={(p) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      name: p.name,
+                      surname: p.surname,
+                      email: p.email || '',
+                      phone_number: p.phone_number,
+                      birth_date: p.birth_date || '',
+                    }))
+                  }
+                />
+              )}
               <div className="grid gap-2">
                 <Label htmlFor="tour_id">Tour</Label>
                 <select
@@ -343,7 +358,6 @@ export default function Participants() {
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    required
                   />
                 </div>
                 <div className="grid gap-2">
@@ -364,7 +378,6 @@ export default function Participants() {
                     type="date"
                     value={formData.birth_date}
                     onChange={(e) => setFormData({ ...formData, birth_date: e.target.value })}
-                    required
                   />
                 </div>
                 <div className="grid gap-2">

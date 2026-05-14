@@ -24,6 +24,16 @@ async def list_participants(
     return participants
 
 
+@router.get("/search", response_model=list[ParticipantResponse])
+async def search_participants(
+    q: str = "",
+    current_user: User = Depends(get_current_user),
+):
+    if not q.strip():
+        return []
+    return await participant_crud.search_participants(query=q.strip())
+
+
 @router.get("/{participant_id}", response_model=ParticipantResponse)
 async def get_participant(
     participant_id: UUID,
